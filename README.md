@@ -1,1 +1,14 @@
-# stats170
+# Time_Series_Analysis
+
+UCLA STATS170 Winter 2023 (Final Overall Course Grade: In Progress)
+
+Course Title: Time Series Analysis
+
+Topics: 
+- Introduction to Time Series Database Management Systems, R treatment of dates, APIs, places to obtain time series data and time series data analysis competitions. 
+- Descriptive analysis of time series data, and jargon of time series data analysis.   
+- The classical multiple regression model and its application to forecasting.  
+- Autoregressive and Moving Average Forecasting models and ARMA(p,q) models for one stationary time series at a time.  
+- ARIMA(p,d,q) models for nonstationary time series and ARIMA(p,d,q)(P,D,Q) for seasonal time series.  
+- Multivariate time series methods 
+- Machine learning for time series  (This topic will be introduced throughout the whole course, as needed for each of the topics above and at increasing levels of complexity as more is learned).  
