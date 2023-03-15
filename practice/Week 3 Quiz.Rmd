@@ -1,0 +1,166 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# R Code that I used to solve problems provided in Quiz 2
+
+Question 8
+```{r}
+LakeHuron
+
+plot(LakeHuron)
+
+
+acf(LakeHuron)
+
+
+```
+
+
+Question 10
+```{r}
+rooms=scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/rooms.txt")
+
+rooms
+plot(rooms)
+
+y = ts(rooms, frequency = 12, start = c(1977,1))
+
+y
+class(y)
+plot(y)
+
+rooms_ts_log = log(y)
+plot(rooms_ts_log)
+
+rooms_ts_sq = rooms_ts^2
+plot(rooms_ts_sq)
+
+rooms_ts_qua = rooms_ts^(1/3)
+plot(rooms_ts_qua)
+
+# a
+y
+
+# b
+plot(decompose(y, type = "add"))
+plot(decompose(y, type = "mult"))
+
+# c 
+y.trend = decompose(y, type = "add")$trend
+y.trend1 = window(y.trend, start = c(1978,1), end = c(1989,12))
+acf(y.trend1, main = "trend")
+y.seas = decompose(y, type = "add")$seasonal
+y.seas1 = window(y.seas, start = c(1978,1), end = c(1989,12))
+acf(y.seas1, main = "seasonal")
+wy.ran = decompose(y, type = "add")$random
+y.ran1 = window(y.ran, start = c(1978,1), end = c(1989,12))
+acf(y.ran1, main = "random term")
+
+
+# e
+diff1=diff(y.ran1,lag=1,differences=1)  #This does regular differencing for trend over time
+plot.ts(diff1)
+acf(diff1,lag.max=50,main="ACF of (1-B)X")  
+
+```
+
+Question 11
+```{r}
+wave = read.table("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/wave.dat")
+wave
+wave = ts(wave)
+
+acf(wave)[4]
+
+
+wave_4 = lag(wave, k = -4)
+
+data = cbind(wave[1:392], wave_4[5:396])
+cor(data)
+# we can see that the value of r_4 is -0.379 and the correlation we calculated is -0.385. 
+```
+
+Question 12
+```{r}
+y=read.csv("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/wave.dat")
+
+acf(y)
+```
+
+
+
+Question 17
+```{r}
+data=scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/viscosity.txt")
+
+data = ts(data)
+acf(data)
+```
+
+
+Question 19
+```{r}
+towels =scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/towels.txt")
+towels
+acf(towels)
+
+towels_4 = diff(towels, lag = 4)
+acf(towels_4)
+pacf(towels_4)
+towels_1 = diff(towels, lag = 1)
+acf(towels_1)
+pacf(towels_1)
+towels_seas_reg = diff(towels_1, lag =4)
+acf(towels_seas_reg)
+pacf(towels_seas_reg)
+```
+
+
+Question 22
+```{r}
+class(AirPassengers)
+
+plot.ts(AirPassengers)
+
+AP = log(AirPassengers)
+
+dAP = diff(AP, lag = 1, differences = 1) # regular diff once
+
+ddAP = diff(dAP, lag = 12, differences = 1) # seasonal diff once
+
+plot(AP)
+plot(dAP)
+plot(decompose(dAP))
+plot(ddAP)
+```
+
+Question 24
+```{r}
+x=ts(c(2,5,9,3,4,10,15,20,1),start=1950,frequency=1) #the time series
+
+ x1=diff(x,lag=1,differences=1) # x_t-x_t-1
+x1
+ x11=diff(x,lag=1,differences=2) # regular difference once twice x1_t-x1_t-1
+ x11
+
+## alternatively, you may do
+
+x11=diff(x1,lag=1,differences=1) # regular difference once to get x1, difference regular x1 once 
+
+##Contrast what you get above with what you get with
+
+x2=diff(x,lag=2,differences=1) # xt-xt-2
+ x2
+```
+
+
+Question 25
+```{r}
+data=scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/towels.txt")
+data = ts(data)
+plot(data)
+acf(data)
+```
+
