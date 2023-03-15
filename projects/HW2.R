@@ -8,7 +8,7 @@
 ### I. Introduction
 library(Quandl)
 library(dygraphs)
-Quandl.api_key("Rtc_Eon27jXhwyGeEfyr")
+Quandl.api_key("")
 
 retail_electronic = Quandl(code="FRED/RSEASN",type="ts", collapse="monthly", meta=TRUE)
 # Do not include 2020 and 2021 years in our data
