@@ -12,3 +12,7 @@ Topics:
 - ARIMA(p,d,q) models for nonstationary time series and ARIMA(p,d,q)(P,D,Q) for seasonal time series.  
 - Multivariate time series methods 
 - Machine learning for time series  (This topic will be introduced throughout the whole course, as needed for each of the topics above and at increasing levels of complexity as more is learned).  
+
+
+Note:
+- Insert personal Quandl Key to run all code
