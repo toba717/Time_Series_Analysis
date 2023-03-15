@@ -1,0 +1,129 @@
+---
+title: "Homework1 Final"
+author: "Takao"
+date: "2023-01-31"
+output: html_document
+---
+######################
+# Anish Dulla, Daniel Neufeldt, Takao Oba, Shochiiro Ueno
+# Homework 1
+# January 30, 2023
+######################
+
+### I. Introduction
+```{r}
+library(Quandl)
+library(dygraphs)
+Quandl.api_key("uSPQnqK5PuPzTydvoB_R") 
+
+retail_electronic = Quandl(code="FRED/RSEASN",type="ts", collapse="monthly", meta=TRUE)
+# Do not include 2020 and 2021 years in our data
+electronic = window(retail_electronic, end = c(2019, 12))
+# > 200 observations & start: 1992 1
+
+retail_hobby = Quandl(code = "FRED/RSSGHBMSN", type = "ts", collapse = "monthly", meta = TRUE)
+# Do not include 2020 and 2021 years in our data
+hobby = window(retail_hobby, end = c(2019, 12))
+# > 200 observations & start: 1992 1
+
+retail_furniture = Quandl(code = "FRED/RSFHFSN", type = "ts", collapse = "monthly", meta = TRUE)
+# Do not include 2020 and 2021 years in our data
+furniture = window(retail_furniture, end = c(2019, 12))
+# > 200 observations & start: 1992 1
+
+retail_sales <- cbind(electronic, hobby, furniture)
+dygraph(retail_sales, main = "Retail Sales") %>%
+  dyOptions(colors = RColorBrewer::brewer.pal(3, "Set2"))
+
+retails_electronic_train = electronic %>% 
+  window(end = c(2018, 12))
+
+retails_elecronic_test = electronic %>% 
+  window(start = 2019)
+```
+
+
+### II. Components Features of the dependent variable
+```{r}
+add_decomp_plot <- plot(decompose(retails_electronic_train, type='add')) 
+mult_decomp_plot <- decompose(retails_electronic_train, type = "mult")
+add_decomp_plot
+mult_decomp_plot$seasonal
+
+boxplot_elec <- boxplot(retails_electronic_train ~ cycle(retails_electronic_train))
+```
+
+## III. 
+```{r}
+acf(retails_electronic_train)
+
+retails_electronic_train_log = log(retails_electronic_train)
+
+retails_electronic_train_quadratic = retails_electronic_train^2
+
+retails_electronic_train_squared = sqrt(retails_electronic_train)
+
+par(mfrow = c(3, 1))
+plot(retails_electronic_train_log, main = "log") 
+plot(retails_electronic_train_quadratic, main = "quadratic")
+plot(retails_electronic_train_squared, main = "squared")
+
+log_data = diff(retails_electronic_train_log)
+# plot(log_data) # now it is a mean of zero and has a constant variance
+
+par(mfrow=c(1, 2))
+acf(log_data, main = 'ACF')
+pacf(log_data, main = 'PACF')
+
+seasonal_diff = diff(retails_electronic_train_log, lag = 12)
+plot(log_data) # now it is a mean of zero and has a constant variance
+
+par(mfrow=c(1, 2))
+acf(log_data, main = 'reular')
+acf(seasonal_diff, main = 'seasonal')
+
+plot(seasonal_diff)
+```
+
+## IV.
+```{r}
+electronic_smooth <- HoltWinters(retails_electronic_train, seasonal = "multiplicative")
+plot(electronic_smooth, main = "Exponential Smoothing Model of Electronic Retail Sales", xlab = "Year", ylab = "Retail Sales (in Millions of Dollars")
+
+electronic_pred <- predict(electronic_smooth, n.ahead = 12)
+electronic_pred
+
+plot(electronic_smooth, electronic_pred, main = "Exponential Smoothing of Electronic Retail Sales With Forecasting",
+     xlab = "Year", ylab = "Retail Sales (in Millions of Dollars)")
+lines(retails_elecronic_test, col = "blue", lty = 2)
+
+par(mfrow = c(1, 2))
+plot(electronic_pred, main = "Actual (black) Vs Predicted\n (red) Retail Sales in 2019", xlab = "Time (in years)", ylab = "Retail Sales (in millions of dollars")
+lines(retails_elecronic_test, col = "red", lty = 2)
+
+residual = as.numeric(retails_elecronic_test) - as.numeric(electronic_pred)
+plot(residual, main = "Residuals of Predicted\n Retail Sales in 2019", xlab = "Time (in years)", ylab = "Residuals (in millions of dollars")
+abline(h = 0, col = "red")
+```
+
+## V.
+```{r}
+df = data.frame(as.numeric(time(retails_electronic_train)))
+
+df$values = as.numeric(retails_electronic_train)
+
+colnames(df)[1] <- "retail_electronics_train"
+
+quad_model <- lm(values ~ poly(retail_electronics_train, 2), data = df)
+
+summary(quad_model)
+
+testTimeRE <- data.frame(as.numeric(time(retails_elecronic_test)))
+colnames(testTimeRE)[1] <- "retail_electronics_train"
+predictions <- predict(quad_model, newdata=testTimeRE)
+seasonals <- as.numeric(mult_decomp_plot$seasonal)[1:12]
+total_predict <- predictions * seasonals
+quad_predict <- ts(total_predict)
+
+quad_predict
+```
