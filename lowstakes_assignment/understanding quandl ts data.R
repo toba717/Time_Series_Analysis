@@ -18,7 +18,7 @@
 install.packages("Quandl") # installing Quandl package
 # ?Quandl() # retrieving Quandl information
 library(Quandl) # load Quandl package
-Quandl.api_key("uSPQnqK5PuPzTydvoB_R")
+Quandl.api_key("")
 
 
 # I
