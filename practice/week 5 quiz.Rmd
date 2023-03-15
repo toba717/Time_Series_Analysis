@@ -1,0 +1,505 @@
+---
+title: "Week 5 Quiz"
+author: "Takao"
+date: "2023-02-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Week 5 Quiz
+# Takao Oba
+
+
+## Question 5
+Read the following time series
+
+data=scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/viscosity.txt")
+
+It contains the daily observations of viscosity of a chemical product. It is not a time a series object yet.  Differencing is something that we would need to do if the time series is not mean stationary (because of trend or seasonality). 
+
+Would we need to difference this data set to make it stationary and ready for fitting a stationary model?
+
+Group of answer choices
+
+Yes, because the ACF shows clearly that the time series is nonstationary in mean.
+
+Yes, because the time plot shows a very steep trend in mean
+
+No, because the ACF shows that the time series is white noise
+
+No, because the ACF shows that the data are mean stationary.
+```{r}
+data=scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/viscosity.txt")
+plot(ts(data))
+par(mfrow = c(1,2))
+acf(ts(data))
+pacf(ts(data))
+```
+
+
+## Question 6
+towels =scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/towels.txt")
+
+is quarterly data.
+
+Make the time series an R time series object.
+
+Do  the following operations separately using R.
+
+(a) Only seasonal differencing once:  
+
+ do time plot and acf and pacf plots of the resulting data which you will cal y.s
+
+(b) Only regular differencing once  
+
+do time plot  and acf and pacf of the resulting data which you will call y.d1
+
+(c) Seasonal differencing of the regular differencing 
+
+do time plot and acf and pacf of the resulting data which you will call  y.d.s
+
+Which of the differencing has resulted in more stationarity and less  correlation to be explained in a future model?
+
+Group of answer choices
+
+Regular differencing of the raw data once.
+
+First seasonal differencing of the first regular differenced raw data
+
+first seasonal differencing of the data
+
+The raw data itself is the most stationary version of itself
+
+```{r}
+towels =scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/towels.txt")
+towels <- ts(towels)
+plot(towels)
+par(mfrow = c(1,2))
+acf(towels)
+pacf(towels)
+
+# seasonal differencing once
+towels_seas <- ts(diff(towels, lag = 4))
+plot(towels_seas)
+par(mfrow = c(1,2))
+acf(towels_seas)
+pacf(towels_seas)
+
+# regular differencing once
+towels_reg <- ts(diff(towels))
+plot(towels_reg)
+par(mfrow = c(1,2))
+acf(towels_reg)
+pacf(towels_reg)
+
+
+# seasonal and regular differencing
+towels_seas_reg <- ts(diff(towels_reg, lag = 4))
+plot(towels_seas_reg)
+par(mfrow = c(1,2))
+acf(towels_seas_reg)
+pacf(towels_seas_reg)
+
+```
+
+## Question 9
+
+second differencing of yt will convert the following values of 
+
+2,5,9,3,4,10,15,20,1 
+
+to
+
+Group of answer choices
+
+7,  -2, -5,  7, 11, 10, -14
+
+3, 4, -6, 1, 6, 5, 5, -19
+
+1 , -10,  7,  5,  -1,  0,  -24
+
+2, 5 ,9, 3,  4,  10, 15, 20, 1
+
+```{r}
+temp <- c(2,5,9,3,4,10,15,20,1)
+tempdiff <- diff(temp)
+tempdiffdiff <- diff(tempdiff)
+tempdiffdiff
+```
+
+
+
+## Question 20
+
+In this question you will use only the code provided to you in class and refer to the lecture video where you saw the procedure being done. You must explain what  you are doing in the space provided  (referring to the lectures day and lecture where we did it). Write your R code in the space provided after your explanation, just R script, without markdown. The code must run without errors. I will copy paste and run, if any error, I will not grade it.
+
+The presentation must have
+
+First explanation using (a) (b),... (f) written as for a presentation to others
+
+Second, attached, the code.
+
+.......................
+
+Suppose we have the  quarterly time series Johnson and Johnson 
+ . Conduct all of the steps of the ARIMA modeling with the time series
+
+(a) Does it need pre-transformation to stabilize variance? Do it if needed. Keep track of what you are doing by calling the new variable Y*.
+
+(b) Determine whether differencing is needed and do it if needed. Express the new series in polynomial notation, for example (1-B)y* if first order regular differencing. Justify your answer.
+
+(c) Identify a model and justify your choice using rules provided in class. Write the model in ARIMA notation ARIMA(p,d,q)(P,D,Q)_F
+
+(d) Fit the tentatively identified model using the code as in lecture. Check the residuals. IF they are white noise, adopt this model, otherwise, check the acf and pacf of the residuals to see what signal you are missing, and identify a new model. Keep the number of coefficients small. Justify.
+
+(e) After you are done and your residuals are write noise, write the model in polynomial form, with AR and differencing polynomials on the left hand side of the = sign and the MA polynomials on the right.
+
+(f) Check the roots of the seasonal and regular polynomials that you have to see if the processes are stationary or invertible (whatever applies).
+
+```{r}
+# a
+plot(JohnsonJohnson) 
+JohnsonJohnson
+# pre-transformation is needed as there is increasing variance as we go along time.
+temp = log(JohnsonJohnson)
+# We use log transformation for the data
+plot(temp)
+# See if this transformation did any good
+temp = JohnsonJohnson^(1/4)
+# Try take the 4th root to see if anything is better
+plot(temp)
+
+# The log transformation transforms the data better so we will use that one
+Ystar = log(JohnsonJohnson)
+```
+
+```{r}
+# b
+par(mfrow = c(1,2))
+acf(Ystar)
+pacf(Ystar)
+
+# differencing is needed as there is an increasing trend.
+
+# We will first begin with first order regular differencing
+Ystar_diff <- diff(Ystar)
+par(mfrow = c(1,2))
+acf(Ystar_diff)
+pacf(Ystar_diff)
+
+# There is seasonality, so we will look at seasonal differencing
+Ystar_seas <- diff(Ystar, lag = 4)
+par(mfrow = c(1,2))
+acf(Ystar_seas)
+pacf(Ystar_seas)
+
+# We will try both regular and seasonal differencing
+Ystar_diff_seas <- diff(Ystar_diff,lag = 4)
+par(mfrow = c(1,2))
+acf(Ystar_diff_seas)
+pacf(Ystar_diff_seas)
+
+# It seams that the first order seasonal differencing performs the best in terms of differencing. This will be expressed in terms of (1-B^4)y*
+```
+
+```{r}
+# c
+par(mfrow = c(1,2))
+acf(Ystar_seas)
+pacf(Ystar_seas)
+
+par(mfrow = c(1,2))
+acf(Ystar_diff_seas, lag = 50)
+pacf(Ystar_diff_seas, lag = 50)
+
+model1 <- arima(Ystar_seas, order = c(0,0,1), seas = list(order = c(0,1,1), 4))
+model1
+
+model2 <- arima(Ystar_seas, order = c(0,0,2), seas = list(order = c(0,1,1), 4))
+model2
+
+# We will aim to use model2. This is because from the acf and the pacf of the seasonally differenced data, we can see that there is a sharp decay on the ACF graph and a slow decay on the PACF graph. This is an indication that an MA model is appropriate. Furthermore, we look forward to finding the numbers for p,d,q, P, D, Q, F.
+# Since we are not utilizing an AR model, the value of p and P will be 0. Furthermore, the order of regular differencing is 0 so we will have d = 0 and the order of seasonal differencing is 1 so we will have D = 1.Finally, we count that there are two significant points in the regular part or short term correlation, thus the value of q = 2, and there is one significance point in the seasonal part and thus the value of Q = 1.
+```
+
+```{r}
+# d
+
+model1 <- arima(Ystar_seas, order = c(0,0,1), seas = list(order = c(0,1,1), 4))
+model1
+
+# Checking white noise
+plot(resid(model1))
+par(mfrow = c(1,2))
+acf(resid(model1), lag.max = 100, main = "ACF of residuals of model 1")
+pacf(resid(model1), lag.max = 100, main = "PACF of residuals of model 1")
+
+plot(resid(model2))
+par(mfrow = c(1,2))
+acf(resid(model2), lag.max = 100, main = "ACF of residuals of model 2")
+pacf(resid(model2), lag.max = 100, main = "PACF of residuals of model 2")
+
+# Looking at the ACF and PACF, we have significant evidence that the residual is white noise because majority of the vertifcal lines are insignificant. The few vertical lines that are significant can be due to sampling error.
+
+```
+
+ 
+```{r}
+# e
+model1
+# Since this is an MA model, we are looking at the right side of the equal sign
+# (1-(B_1)^4)(1-B)x* = (1+a_1*(B_1))(1+a_1s*(B_2)^4)w*
+# (1-(B_1)^4)(1-B)x* = (1+0.2258*(B_1))(1-0.8748*(B_2)^4)w*
+```
+ 
+```{r}
+# f
+model2
+# (1-(B_1)^4)(1-B)x* = (1+0.2258*(B_1))(1-0.8748*(B_2)^4)w*
+Mod(polyroot(c(1, 0.2258)))
+Mod(polyroot(c(1, -0.8748)))
+Mod(polyroot(c(1, -0.3294)))
+# Since the roots are greater than 1 for both of the coefficients, we can conclude that the processes are invertible. Further, MA always is stationary, so we can also conclude that the process is stationary.
+```
+
+## Question 21
+
+```{r}
+Mod(polyroot(c(1,-0.2,0.4)))
+```
+
+## Question 29
+
+```{r}
+Mod(polyroot(c(1, -0.5, -0.5)))
+```
+
+
+## Question 30
+
+I did the following in R
+
+a=diff(log(AirPassengers),lag=1)
+acf(a)
+b=diff(a,lag=12)
+acf(b)
+
+par(mfrow=c(2,1))
+acf(b)
+pacf(b)
+dev.off()
+
+model1=arima( variable  , order=c(1,1,1),seas=list(order=c(1,1,1), 12))
+model1
+
+What variable name will replace the bold face variable as argument in the arima function and after you replace, are the residuals white noise?
+
+ 
+
+Group of answer choices
+
+log(AirPassengers) and the residuals will be white noise
+
+b, and the residuals will be white noise
+
+AirPassengers and the residuals will be white noise
+
+log(AirPassengers) and the residuals will not be white noise.
+
+```{r}
+a=diff(log(AirPassengers),lag=1)
+acf(a)
+b=diff(a,lag=12)
+acf(b)
+
+
+par(mfrow=c(1,2))
+acf(a)
+pacf(a)
+
+par(mfrow=c(1,2))
+acf(b)
+pacf(b)
+
+par(mfrow=c(1,2))
+acf(log(AirPassengers))
+pacf(log(AirPassengers))
+
+model1=arima( b,order=c(1,1,1),seas=list(order=c(1,1,1), 12))
+model1
+
+acf(resid(model1), lag.max = 50)
+```
+
+## Question 31
+
+```{r}
+Mod(polyroot(c(1, -0.1666)))
+```
+
+
+## Question 32
+When you calculate the Ljung-Box test for lag=6 for the rooms data without any transformation, the test statistic has value 
+
+Group of answer choices
+
+0.000000000
+
+191.66
+
+6
+
+4.1678
+
+```{r}
+rooms=scan("http://www.stat.ucla.edu/~jsanchez/timeseriestimedata/rooms.txt") 
+
+
+
+Box.test(ts(rooms), lag = 6, type = "Ljung")
+```
+
+
+
+## Question 35
+```{r}
+########## The R program that you initially fitted. 
+
+# install.packages("vars")
+
+library(vars)
+
+data(Canada)
+
+class(Canada)
+
+#time plot for Canada#
+
+plot.ts(Canada)
+
+boxplot(Canada~cycle(Canada),main="boxplot for Canada")
+
+acf(Canada) 
+
+#training and test data#
+
+Canada.training=window(Canada,start=c(1980,1),end=c(1998,4))
+
+Canada.test=window(Canada,start=c(1999,1), end=c(2000,4))
+
+ 
+
+#difference data#
+
+diff.Canada=diff(Canada.training,lag=1,diff=1)
+
+plot.ts(diff.Canada)
+
+acf(diff.Canada)
+
+U.diff=diff.Canada[,4]
+
+par(mfrow=c(2,1))
+
+acf(U.diff,lag=50,main="acf of reg differenced Unemployment ")
+
+pacf(U.diff,lag=50,main="pacf of reg differenced Unemployment")
+
+dev.off()
+
+#ARIMA model#
+
+model=arima(U.diff,order=c(1,1,0), seas=list(order=c(0,0,0),4))   
+
+model
+
+acf(residuals(model),main="ACF of residuals of  model1")
+
+Box.test(residuals(model),lag=12,type="Ljung-Box")
+
+ 
+
+forecast=predict(model,8)$pred  
+
+forecast
+
+start(forecast)
+
+end(forecast)
+
+forecast.se=predict(model,8)$se
+
+ 
+
+#CI for forecast1#
+
+ci.low= ts(forecast-1.96*forecast.se, start=c(1999,1),end=c(2000,4),freq=4)
+
+ci.high=ts(forecast+1.96*forecast.se,start=c(1999,1),end=c(2000,4),freq=4)
+
+ts.plot(cbind(U.diff,forecast,ci.low, ci.high), 
+
+lty=c(1,2,3,3), col=c("black", "red","blue","blue"),
+
+main="Predicted 8 quarterly values of unemployment",ylab="diff unemployment")
+
+rmse= function(x,y){
+
+  
+
+  a=sum((x-y)^2)
+
+  
+
+  b=length(x)
+
+  
+
+  rmse=sqrt(a/b)
+
+  
+
+  rmse
+
+  
+
+}
+
+Canada.test.diff=diff(Canada.test,lag=1,diff=1)
+
+rmse(Canada.test.diff[,4],forecast )  
+```
+
+
+## Question 41
+```{r}
+# part a
+data=read.csv("/Users/takaooba/Downloads/ch1passengers.csv", header=T)
+data <- data[, 1:3]
+data$DOMESTIC <- as.numeric(gsub(",","",data$DOMESTIC))
+data <- within(data, Date <- sprintf("%d-%02d", Year, Month))
+data <- data[, "DOMESTIC"]
+
+# part b
+x11 <- ts(data, freq = 12, start = c(2002, 10), end = c(2019, 6))
+
+x11_train <- window(x11, start = c(2002, 10), end = c(2018, 1))
+x11_test <- window(x11, start = c(2018, 2), end = c(2019, 6))
+
+x11_diff <- diff(x11_train, diff = 1)
+
+x11_seasonaldiff_diff <- diff(x11_diff, lag = 12, diff = 1)
+
+acf(x11_seasonaldiff_diff)
+pacf(x11_seasonaldiff_diff)
+
+# e
+arima(x11_train, order=c(1,1,1), seas = list(order=c(1,1,0), 12))
+```
+
+
+
+
