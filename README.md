@@ -1,6 +1,6 @@
 # Time_Series_Analysis
 
-UCLA STATS170 Winter 2023 (Final Overall Course Grade: In Progress)
+UCLA STATS170 Winter 2023 (Final Overall Course Grade: A)
 
 Course Title: Time Series Analysis
 
